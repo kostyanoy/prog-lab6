@@ -30,6 +30,8 @@ dependencies {
     implementation("io.insert-koin:koin-core:$koinVersion")
     implementation("org.slf4j:slf4j-log4j12:2.0.6")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+
+    implementation(project(":common"))
 }
 
 
