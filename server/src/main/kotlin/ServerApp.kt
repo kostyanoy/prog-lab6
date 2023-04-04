@@ -1,10 +1,8 @@
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import java.net.ServerSocket
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
-import java.io.Serializable
+import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
 
@@ -23,14 +21,15 @@ class ServerApp(private val port: Int) : KoinComponent {
             println("Ошибка подключения клиента: ${e.message}")
         }
     }
-fun clientConnect(socket: Socket) : KoinComponent {
+
+    fun clientConnect(socket: Socket) {
         try {
             val gis = socket.getInputStream()
             val gos = socket.getOutputStream()
             val ois = ObjectInputStream(gis)
             val oos = ObjectOutputStream(gos)
             while (true) {
-                val request = ois.readObject()
+                val request = ois.readObject() as Frame
                 val response = clientRequest(request)
                 oos.writeObject(response)
                 oos.flush()
@@ -41,10 +40,13 @@ fun clientConnect(socket: Socket) : KoinComponent {
             socket.close()
         }
     }
-fun clientRequest(request: Frame) : Serializable {
-    // здесь будет обработка запросов через лямбды
-    fun process(request: Any): String {
-        return when (this.request.type) {
+
+    fun clientRequest(request: Frame) {
+        // здесь будет обработка запросов через лямбды
+        fun process(request: Any): String {
+            return when (request) {
+
         }
+        return process(request)
     }
-}}
+}

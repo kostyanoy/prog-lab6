@@ -4,7 +4,6 @@ import ArgumentType
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import utils.CommandResult
-import utils.Interactor
 
 
 /**

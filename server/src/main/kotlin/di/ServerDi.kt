@@ -28,9 +28,6 @@ val serverModule = module {
     single<Storage<LinkedHashMap<Int, MusicBand>, Int, MusicBand>> {
         StorageManager()
     }
-    single<Interactor> {
-        InteractionManager(userManager = get(), saver = get(), fileManager = get(), storage = get())
-    }
     factory {
         CommandManager()
     }

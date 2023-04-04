@@ -1,6 +1,5 @@
 package utils
 
-import exceptions.CommandException
 import commands.*
 import org.koin.core.component.KoinComponent
 
@@ -27,4 +26,8 @@ class CommandManager() : KoinComponent {
         "filter_less_than_genre" to FilterLessThanGenre(),
         "undo" to Undo()
     )
+
+    /**
+     * Checks if the command exists
+     */
 }
