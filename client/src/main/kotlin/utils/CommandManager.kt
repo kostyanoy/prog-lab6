@@ -3,14 +3,19 @@ package utils
 import ArgumentType
 import ClientApp
 import Frame
+import FrameType
 import exceptions.CommandException
 
 class CommandManager {
-    private val commands = mapOf("help" to arrayOf<ArgumentType>())
+    private val commands = mutableMapOf("help" to arrayOf<ArgumentType>())
 
     fun updateCommands(clientApp: ClientApp) {
-        clientApp.sendFrame(Frame())
-        TODO()
+        val frame = Frame(FrameType.LIST_OF_COMMANDS_REQUEST)
+        clientApp.sendFrame(frame)
+        val respond = clientApp.receiveFrame()
+        commands.clear()
+        commands.putAll(respond.body as Map<String, Array<ArgumentType>>)
+
     }
 
     fun getArgs(command: String): List<ArgumentType>{

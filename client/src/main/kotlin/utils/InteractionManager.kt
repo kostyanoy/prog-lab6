@@ -4,6 +4,7 @@ import ArgumentType
 import ClientApp
 import FileManager
 import Frame
+import FrameType
 import data.MusicGenre
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -72,7 +73,7 @@ class InteractionManager(
     override fun executeCommand(command: String) {
         val argTypes = commandManager.getArgs(command)
         val args = getArgs(argTypes)
-        clientApp.sendFrame(Frame())
+        clientApp.sendFrame(Frame(FrameType.COMMAND_REQUEST))
         TODO()
 //        when (val result = command.execute(args)) {
 //            is CommandResult.Failure -> userManager.writeLine("Команда ${result.commandName} завершилась ошибкой: ${result.throwable.message}")

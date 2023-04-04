@@ -3,6 +3,7 @@ package utils
 import ArgumentType
 import ClientApp
 import Frame
+import FrameType
 import data.Album
 import data.Coordinates
 import data.MusicBand
@@ -61,7 +62,7 @@ class FileInteractor(
     override fun executeCommand(command: String) {
         val argTypes = commandManager.getArgs(command)
         val args = getArgs(argTypes)
-        clientApp.sendFrame(Frame())
+        clientApp.sendFrame(Frame(FrameType.COMMAND_REQUEST))
         TODO()
 //        val args = getArgs(command)
 //        when (val result = command.execute(args)) {

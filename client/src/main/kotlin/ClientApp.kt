@@ -35,3 +35,4 @@ class ClientApp(private val serverPort: Int) : KoinComponent {
         return frameSerializer.deserialize(ois.readObject() as String)
     }
 }
+
