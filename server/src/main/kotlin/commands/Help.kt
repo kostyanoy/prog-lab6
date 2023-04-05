@@ -14,7 +14,7 @@ class Help : Command() {
 
     override fun getDescription(): String = "help : вывести справку по доступным командам"
 
-    override fun execute(args: ArrayList<Any>): CommandResult {
+    override fun execute(args: Map<String, Any>): CommandResult {
         val message = buildString {
             commandManager.commands.values.forEach {
                 appendLine(it.getDescription())

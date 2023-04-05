@@ -9,7 +9,7 @@ import utils.CommandResult
 class Clear : StorageCommand() {
     override fun getDescription(): String = "clear : очистить коллекцию"
 
-    override fun execute(args: ArrayList<Any>): CommandResult {
+    override fun execute(args: Map<String, Any>): CommandResult {
         storage.clear()
         return CommandResult.Success("Clear")
     }

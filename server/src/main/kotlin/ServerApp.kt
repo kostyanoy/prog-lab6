@@ -1,52 +1,95 @@
 import org.koin.core.component.KoinComponent
-import java.io.IOException
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
-import java.net.ServerSocket
-import java.net.Socket
-import java.net.SocketException
+import org.koin.core.component.inject
+import serialize.FrameSerializer
+import utils.CommandManager
+import java.net.InetSocketAddress
+import java.nio.ByteBuffer
+import java.nio.channels.SelectionKey
+import java.nio.channels.Selector
+import java.nio.channels.ServerSocketChannel
+import java.nio.channels.SocketChannel
 
 class ServerApp(private val port: Int) : KoinComponent {
+    private val commandManager: CommandManager by inject()
+    private val serializer = FrameSerializer()
+
     fun start() {
         println("Сервер запускается на порту: $port")
-        try {
-            //прослеживает подключения
-            val serverSocket = ServerSocket(port)
-            while (true) {
-                val socket = serverSocket.accept() //блокируется пока новый клиент не подключится(каждый раз новый сокет будет)
-                println("Произошло подключение клиента: ${socket.inetAddress.hostAddress}") //ip получает
-                clientConnect(socket)
+        val selector = Selector.open()
+        val serverChannel = ServerSocketChannel.open()
+        serverChannel.bind(InetSocketAddress(port))
+        serverChannel.register(selector, SelectionKey.OP_ACCEPT)
+        serverChannel.configureBlocking(false)
+
+        while (true) {
+            selector.select()
+            val selectedKeys = selector.selectedKeys().iterator()
+
+            while (selectedKeys.hasNext()) {
+                val key = selectedKeys.next()
+                selectedKeys.remove()
+
+                if (!key.isValid) {
+                    continue
+                }
+
+                if (key.isAcceptable) {
+                    acceptConnection(key, selector)
+                } else if (key.isReadable) {
+                    readRequest(key, selector)
+                }
             }
-        } catch (e: IOException) {
-            println("Ошибка подключения клиента: ${e.message}")
         }
     }
 
-    fun clientConnect(socket: Socket) {
+    private fun acceptConnection(key: SelectionKey, selector: Selector) {
+        val serverSocketChannel = key.channel() as ServerSocketChannel
+        val socketChannel = serverSocketChannel.accept()
+        socketChannel.configureBlocking(false)
+        socketChannel.register(selector, SelectionKey.OP_READ)
+    }
+
+    private fun readRequest(key: SelectionKey, selector: Selector) {
+        val socketChannel = key.channel() as SocketChannel
+        val buffer = ByteBuffer.allocate(1024)
+
         try {
-            val gis = socket.getInputStream()
-            val gos = socket.getOutputStream()
-            val ois = ObjectInputStream(gis)
-            val oos = ObjectOutputStream(gos)
-            while (true) {
-                val request = ois.readObject() as Frame
-                val response = clientRequest(request)
-                oos.writeObject(response)
-                oos.flush()
-            }
-        } catch (e: SocketException) {
-            println("Клиент отключился: ${socket.inetAddress.hostAddress}")
-        } finally {
-            socket.close()
+            socketChannel.read(buffer)
+            val request = serializer.deserialize(buffer.array().decodeToString())
+            val response = clientRequest(request)
+            buffer.clear()
+            buffer.put(serializer.serialize(response).toByteArray())
+            buffer.flip()
+            socketChannel.write(buffer)
+        } catch (e: Exception) {
+            key.cancel()
+            socketChannel.close()
         }
     }
 
-    fun clientRequest(request: Frame) {
-        // здесь будет обработка запросов через лямбды
-        fun process(request: Any): String {
-            return when (request) {
+    private fun clientRequest(request: Frame): Frame {
+        val response = Frame(FrameType.COMMAND_RESPONSE)
 
+        when (request.type) {
+            FrameType.COMMAND_REQUEST -> {
+                val commandName = request.body["name"] as String
+                val args = request.body["args"] as List<Any>
+                val command = commandManager.getCommand(commandName)
+                val result = command.execute(args.associateBy({ it.toString() }, { it }))
+                response.setValue("data", result)
+            }
+
+            FrameType.LIST_OF_COMMANDS_REQUEST -> {
+                val commands = commandManager.commands.mapValues { it.value.getArgumentTypes() }.toMap()
+                response.setValue("commands", commands)
+            }
+
+            else -> {
+                response.setValue("data", "Неверный тип запроса")
+            }
         }
-        return process(request)
+
+        return response
     }
 }
+

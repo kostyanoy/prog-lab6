@@ -12,9 +12,9 @@ class RemoveGreaterKey : UndoableCommand() {
     override fun getDescription(): String =
         "remove_greater_key : удалить из коллекции все элементы, ключ которых превышает заданный"
 
-    override fun execute(args: ArrayList<Any>): CommandResult {
+    override fun execute(args: Map<String, Any>): CommandResult {
         previousPair.clear()
-        val userKey = args[0] as Int
+        val userKey = args["0"] as Int
         storage.getCollection { userKey < key }
             .forEach {
                 previousPair.add(it.key to it.value)

@@ -10,7 +10,7 @@ class Show : StorageCommand() {
     override fun getDescription(): String =
         "show : вывести в стандартный поток вывода все элементы коллекции в строковом представлении"
 
-    override fun execute(args: ArrayList<Any>): CommandResult {
+    override fun execute(args: Map<String, Any>): CommandResult {
         val message = buildString {
             appendLine("Коллекция содержит: ")
             storage.getCollection { true }

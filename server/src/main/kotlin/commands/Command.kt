@@ -10,7 +10,6 @@ import utils.CommandResult
  * An abstract class for defining commands.
  */
 abstract class Command : KoinComponent {
-    val interactor: Interactor by inject()
     /**
     Returns a description of the command.
      */
@@ -21,6 +20,6 @@ abstract class Command : KoinComponent {
      *
      * @return [CommandResult] with the name of the command and data or exception returned by the command
      */
-    abstract fun execute(args: ArrayList<Any>) : CommandResult
+    abstract fun execute(args: Map<String, Any>) : CommandResult
     abstract fun getArgumentTypes() : Array<ArgumentType>
 }

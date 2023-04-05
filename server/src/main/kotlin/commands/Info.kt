@@ -9,7 +9,7 @@ import utils.CommandResult
 class Info : StorageCommand() {
     override fun getDescription(): String = "info : вывести в стандартный поток вывода информацию о коллекции"
 
-    override fun execute(args: ArrayList<Any>): CommandResult {
+    override fun execute(args: Map<String, Any>): CommandResult {
         return CommandResult.Success("Info", storage.getInfo())
     }
 

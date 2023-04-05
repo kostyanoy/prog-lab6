@@ -9,7 +9,7 @@ import utils.CommandResult
 class Exit : Command() {
     override fun getDescription(): String = "exit : завершить программу (без сохранения в файл)"
 
-    override fun execute(args: ArrayList<Any>): CommandResult {
+    override fun execute(args: Map<String, Any>): CommandResult {
         interactor.exit()
         return CommandResult.Success("Exit")
     }

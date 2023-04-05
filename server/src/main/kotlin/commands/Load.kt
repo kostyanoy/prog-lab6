@@ -13,7 +13,7 @@ import utils.CommandResult
 class Load : StorageCommand() {
     override fun getDescription(): String = "load : загрузить коллекцию из файла"
 
-    override fun execute(args: ArrayList<Any>): CommandResult {
+    override fun execute(args: Map<String, Any>): CommandResult {
         if (!File("save.txt").exists) {
             return CommandResult.Failure("Load", FileException("Сохраненного файла не обнаружено"))
         }

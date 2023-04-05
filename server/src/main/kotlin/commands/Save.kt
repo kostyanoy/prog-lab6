@@ -9,7 +9,7 @@ import utils.CommandResult
 class Save : StorageCommand() {
     override fun getDescription(): String = "save : сохранить коллекцию в файл"
 
-    override fun execute(args: ArrayList<Any>): CommandResult {
+    override fun execute(args: Map<String, Any>): CommandResult {
         interactor.save(storage.getCollection { true })
         return CommandResult.Success("Save")
     }
