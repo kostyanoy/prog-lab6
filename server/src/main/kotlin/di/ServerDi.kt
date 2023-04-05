@@ -1,12 +1,11 @@
 package di
-
+import ServerApp
 import commands.CommandHistory
 import data.MusicBand
 import org.koin.dsl.module
 import serialize.Serializer
 import utils.*
 import utils.serialize.SerializeManager
-
 
 val serverModule = module {
     factory<Saver<LinkedHashMap<Int, MusicBand>>> {
@@ -31,4 +30,5 @@ val serverModule = module {
     factory {
         CommandManager()
     }
+    single { ServerApp(2222) }
  }

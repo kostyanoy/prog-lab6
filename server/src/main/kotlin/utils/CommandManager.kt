@@ -13,9 +13,6 @@ class CommandManager() : KoinComponent {
         "insert" to Insert(),
         "update" to Update(),
         "remove_key" to RemoveKey(),
-//        "save" to Save(),
-//        "load" to Load(),
-//        "exit" to Exit(),
         "remove_greater" to RemoveGreater(),
         "replace_if_lowe" to ReplaceIfLowe(),
         "remove_greater_key" to RemoveGreaterKey(),
@@ -23,7 +20,12 @@ class CommandManager() : KoinComponent {
         "filter_less_than_genre" to FilterLessThanGenre(),
         "undo" to Undo()
     )
+
     fun getCommand(name: String): Command {
-        return commands[name] ?: throw CommandException("Такой команды не существует")
+        val command = commands[name] ?: throw CommandException("Такой команды не существует")
+        if (command is HiddenCommand && command.hidden()) {
+            throw CommandException("Недостаточно прав доступа для выполнения этой команды")
+        }
+        return command
     }
 }

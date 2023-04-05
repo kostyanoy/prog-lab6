@@ -1,3 +1,4 @@
+import org.apache.log4j.spi.LoggerFactory
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import serialize.FrameSerializer
@@ -8,18 +9,18 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
-
+import org.apache.log4j.Logger
 class ServerApp(private val port: Int) : KoinComponent {
     private val commandManager: CommandManager by inject()
     private val serializer = FrameSerializer()
-
+    private val logger = Logger.getLogger(ServerApp::class.java)
     fun start() {
-        println("Сервер запускается на порту: $port")
+        logger.info("Сервер запускается на порту: $port")
         val selector = Selector.open()
         val serverChannel = ServerSocketChannel.open()
         serverChannel.bind(InetSocketAddress(port))
-        serverChannel.register(selector, SelectionKey.OP_ACCEPT)
         serverChannel.configureBlocking(false)
+        serverChannel.register(selector, SelectionKey.OP_ACCEPT)
 
         while (true) {
             selector.select()
@@ -88,7 +89,6 @@ class ServerApp(private val port: Int) : KoinComponent {
                 response.setValue("data", "Неверный тип запроса")
             }
         }
-
         return response
     }
 }
