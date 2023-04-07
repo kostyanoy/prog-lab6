@@ -1,4 +1,3 @@
-import org.apache.log4j.spi.LoggerFactory
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import serialize.FrameSerializer
@@ -10,19 +9,29 @@ import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 import org.apache.log4j.Logger
+import utils.FileSaver
+import utils.StorageManager
+
 class ServerApp(private val port: Int) : KoinComponent {
     private val commandManager: CommandManager by inject()
+    private val saver: FileSaver by inject()
+    private val storage: StorageManager by inject()
     private val serializer = FrameSerializer()
     private val logger = Logger.getLogger(ServerApp::class.java)
+    private var running = false
+    private lateinit var selector: Selector
+    private lateinit var serverChannel: ServerSocketChannel
+    init {
+        selector = Selector.open()
+    }
     fun start() {
         logger.info("Сервер запускается на порту: $port")
-        val selector = Selector.open()
         val serverChannel = ServerSocketChannel.open()
         serverChannel.bind(InetSocketAddress(port))
         serverChannel.configureBlocking(false)
         serverChannel.register(selector, SelectionKey.OP_ACCEPT)
 
-        while (true) {
+        while (running) {
             selector.select()
             val selectedKeys = selector.selectedKeys().iterator()
 
@@ -41,8 +50,9 @@ class ServerApp(private val port: Int) : KoinComponent {
                 }
             }
         }
+        serverChannel.close()
+        selector.close()
     }
-
     private fun acceptConnection(key: SelectionKey, selector: Selector) {
         val serverSocketChannel = key.channel() as ServerSocketChannel
         val socketChannel = serverSocketChannel.accept()
@@ -90,6 +100,19 @@ class ServerApp(private val port: Int) : KoinComponent {
             }
         }
         return response
+    }
+    fun stop() {
+        running = false
+        selector.wakeup()
+    }
+    fun saveCollection() {
+        saver.save(storage.getCollection { true })
+    }
+
+    fun loadCollection() {
+        val saver: FileSaver by inject()
+        storage.clear()
+        saver.load().forEach { storage.insert(it.key, it.value) }
     }
 }
 
