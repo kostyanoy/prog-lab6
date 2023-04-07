@@ -30,5 +30,5 @@ val serverModule = module {
     factory {
         CommandManager()
     }
-    single { ServerApp(2222) }
+    single { ServerApp(2228) }
  }

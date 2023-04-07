@@ -18,7 +18,7 @@ class ServerApp(private val port: Int) : KoinComponent {
     private val storage: StorageManager by inject()
     private val serializer = FrameSerializer()
     private val logger = Logger.getLogger(ServerApp::class.java)
-    private var running = false
+    private var running = true
     private lateinit var selector: Selector
     private lateinit var serverChannel: ServerSocketChannel
     init {
@@ -66,10 +66,21 @@ class ServerApp(private val port: Int) : KoinComponent {
 
         try {
             socketChannel.read(buffer)
-            val request = serializer.deserialize(buffer.array().decodeToString())
+            buffer.flip()
+            println(buffer)
+            val len = buffer.limit() - buffer.position()
+            val str = ByteArray(len)
+            println(buffer.get(str, buffer.position(), len))
+            buffer.flip()
+            println(str.decodeToString())
+            println(buffer)
+            val request = serializer.deserialize(str.decodeToString())
+            logger.info(request)
             val response = clientRequest(request)
+            println(response)
             buffer.clear()
             buffer.put(serializer.serialize(response).toByteArray())
+            buffer.put('\n'.toByte())
             buffer.flip()
             socketChannel.write(buffer)
         } catch (e: Exception) {
