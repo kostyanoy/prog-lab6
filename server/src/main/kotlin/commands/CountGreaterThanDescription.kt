@@ -1,6 +1,7 @@
 package commands
 
 import ArgumentType
+import CommandResult
 import utils.*
 
 /**
@@ -13,8 +14,8 @@ class CountGreaterThanDescription : StorageCommand() {
     override fun getDescription(): String =
         "count_greater_than_description : вывести количество элементов, значение поля description которых больше заданного"
 
-    override fun execute(args: Map<String, Any>): CommandResult {
-        val userDescription = args["0"] as String
+    override fun execute(args: Array<Any>): CommandResult {
+        val userDescription = args[0] as String
         val countDescription = storage.getCollection { userDescription < value.description }
             .count()
         return CommandResult.Success("Count_greater_than_description", "$countDescription")

@@ -2,7 +2,7 @@ package utils
 
 import data.MusicBand
 import serialize.Serializer
-import utils.serialize.SerializeManager
+import serialize.SerializeManager
 
 
 class FileSaver(

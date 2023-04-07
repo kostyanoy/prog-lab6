@@ -1,8 +1,8 @@
 package commands
 
 import ArgumentType
+import CommandResult
 import data.MusicBand
-import utils.CommandResult
 
 /**
  * The command removes from the collection all items that exceed the specified.
@@ -12,8 +12,8 @@ import utils.CommandResult
 class RemoveGreater : UndoableCommand() {
     override fun getDescription(): String = "remove_greater : удалить из коллекции все элементы, превышающие заданный"
 
-    override fun execute(args: Map<String, Any>): CommandResult {
-        val userElement = args["0"] as MusicBand
+    override fun execute(args: Array<Any>): CommandResult {
+        val userElement = args[0] as MusicBand
         storage.getCollection { userElement < value }
             .forEach {
                 previousPair.add(it.key to it.value)

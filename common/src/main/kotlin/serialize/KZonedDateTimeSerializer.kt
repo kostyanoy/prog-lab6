@@ -1,4 +1,4 @@
-package utils.serialize
+package serialize
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

@@ -1,5 +1,6 @@
 package commands
 
+import Command
 import data.MusicBand
 import org.koin.core.component.inject
 import utils.Storage

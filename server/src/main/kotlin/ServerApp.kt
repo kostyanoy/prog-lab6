@@ -19,11 +19,8 @@ class ServerApp(private val port: Int) : KoinComponent {
     private val serializer = FrameSerializer()
     private val logger = Logger.getLogger(ServerApp::class.java)
     private var running = true
-    private lateinit var selector: Selector
+    private var selector: Selector = Selector.open()
     private lateinit var serverChannel: ServerSocketChannel
-    init {
-        selector = Selector.open()
-    }
     fun start() {
         logger.info("Сервер запускается на порту: $port")
         val serverChannel = ServerSocketChannel.open()
@@ -52,6 +49,7 @@ class ServerApp(private val port: Int) : KoinComponent {
         }
         serverChannel.close()
         selector.close()
+        logger.info("Сервер закрыт")
     }
     private fun acceptConnection(key: SelectionKey, selector: Selector) {
         val serverSocketChannel = key.channel() as ServerSocketChannel
@@ -67,50 +65,49 @@ class ServerApp(private val port: Int) : KoinComponent {
         try {
             socketChannel.read(buffer)
             buffer.flip()
-            println(buffer)
             val len = buffer.limit() - buffer.position()
             val str = ByteArray(len)
-            println(buffer.get(str, buffer.position(), len))
+            buffer.get(str, buffer.position(), len)
             buffer.flip()
-            println(str.decodeToString())
-            println(buffer)
             val request = serializer.deserialize(str.decodeToString())
-            logger.info(request)
             val response = clientRequest(request)
-            println(response)
             buffer.clear()
             buffer.put(serializer.serialize(response).toByteArray())
-            buffer.put('\n'.toByte())
+            buffer.put('\n'.code.toByte())
             buffer.flip()
             socketChannel.write(buffer)
         } catch (e: Exception) {
+            logger.error(e.message)
             key.cancel()
             socketChannel.close()
         }
     }
 
     private fun clientRequest(request: Frame): Frame {
-        val response = Frame(FrameType.COMMAND_RESPONSE)
-
-        when (request.type) {
+        return when (request.type) {
             FrameType.COMMAND_REQUEST -> {
+                val response = Frame(FrameType.COMMAND_RESPONSE)
                 val commandName = request.body["name"] as String
-                val args = request.body["args"] as List<Any>
+                val args = request.body["args"] as Array<Any>
                 val command = commandManager.getCommand(commandName)
-                val result = command.execute(args.associateBy({ it.toString() }, { it }))
+                val result = command.execute(args)
                 response.setValue("data", result)
+                response
             }
 
             FrameType.LIST_OF_COMMANDS_REQUEST -> {
+                val response = Frame(FrameType.LIST_OF_COMMANDS_RESPONSE)
                 val commands = commandManager.commands.mapValues { it.value.getArgumentTypes() }.toMap()
                 response.setValue("commands", commands)
+                response
             }
 
             else -> {
+                val response = Frame(FrameType.COMMAND_RESPONSE)
                 response.setValue("data", "Неверный тип запроса")
+                response
             }
         }
-        return response
     }
     fun stop() {
         running = false

@@ -1,9 +1,10 @@
 package commands
 
 import ArgumentType
+import Command
+import CommandResult
 import org.koin.core.component.inject
 import utils.CommandManager
-import utils.CommandResult
 
 
 /**
@@ -14,7 +15,7 @@ class Help : Command() {
 
     override fun getDescription(): String = "help : вывести справку по доступным командам"
 
-    override fun execute(args: Map<String, Any>): CommandResult {
+    override fun execute(args: Array<Any>): CommandResult {
         val message = buildString {
             commandManager.commands.values.forEach {
                 appendLine(it.getDescription())

@@ -1,6 +1,7 @@
 package commands
 
 import ArgumentType
+import CommandResult
 import data.MusicGenre
 import utils.*
 
@@ -13,8 +14,8 @@ class FilterLessThanGenre : StorageCommand() {
     override fun getDescription(): String =
         "filter_less_than_genre : вывести элементы, значение поля genre которых меньше заданного"
 
-    override fun execute(args: Map<String, Any>): CommandResult {
-        val userGenre = args["0"] as MusicGenre
+    override fun execute(args: Array<Any>): CommandResult {
+        val userGenre = args[0] as MusicGenre
         val message = buildString {
             storage.getCollection { userGenre > value.genre }.forEach(::appendLine)
         }

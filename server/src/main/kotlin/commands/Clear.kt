@@ -1,7 +1,7 @@
 package commands
 
 import ArgumentType
-import utils.CommandResult
+import CommandResult
 
 /**
  * The command that clears the collection.
@@ -9,7 +9,7 @@ import utils.CommandResult
 class Clear : StorageCommand() {
     override fun getDescription(): String = "clear : очистить коллекцию"
 
-    override fun execute(args: Map<String, Any>): CommandResult {
+    override fun execute(args: Array<Any>): CommandResult {
         storage.clear()
         return CommandResult.Success("Clear")
     }

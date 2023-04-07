@@ -1,7 +1,7 @@
 package commands
 
 import ArgumentType
-import utils.CommandResult
+import CommandResult
 
 /**
  * The command outputs information about the collection to the standard output stream
@@ -9,7 +9,7 @@ import utils.CommandResult
 class Info : StorageCommand() {
     override fun getDescription(): String = "info : вывести в стандартный поток вывода информацию о коллекции"
 
-    override fun execute(args: Map<String, Any>): CommandResult {
+    override fun execute(args: Array<Any>): CommandResult {
         return CommandResult.Success("Info", storage.getInfo())
     }
 

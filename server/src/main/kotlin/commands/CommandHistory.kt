@@ -1,7 +1,8 @@
 package commands
 
+import Command
+import CommandResult
 import exceptions.CommandException
-import utils.CommandResult
 
 /**
  * Class that stores the history of executed commands.

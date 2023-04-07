@@ -1,4 +1,4 @@
-package utils.serialize
+package serialize
 
 import data.MusicBand
 import kotlinx.serialization.decodeFromString
@@ -6,7 +6,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
-import serialize.Serializer
 
 /**
  * Implements [Serializer] interface with JSON serialization

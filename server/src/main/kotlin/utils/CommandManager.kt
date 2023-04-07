@@ -1,5 +1,6 @@
 package utils
 
+import Command
 import commands.*
 import exceptions.CommandException
 import org.koin.core.component.KoinComponent

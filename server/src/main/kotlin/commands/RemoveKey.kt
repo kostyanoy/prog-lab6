@@ -1,8 +1,9 @@
 package commands
 
 import ArgumentType
+import CommandResult
 import exceptions.ParameterException
-import utils.CommandResult
+
 /**
  * The command removes an item from the collection by its key
  *
@@ -11,9 +12,9 @@ import utils.CommandResult
 class RemoveKey : UndoableCommand() {
     override fun getDescription(): String = "remove_key : удалить элемент из коллекции по его ключу"
 
-    override fun execute(args: Map<String, Any>): CommandResult {
+    override fun execute(args: Array<Any>): CommandResult {
         previousPair.clear()
-        val userKey = args["0"] as Int
+        val userKey = args[0] as Int
         val collection = storage.getCollection { true }
         if (userKey !in collection.keys) {
             return CommandResult.Failure("Remove_greater", ParameterException("Элемента с таким ключом не существует"))

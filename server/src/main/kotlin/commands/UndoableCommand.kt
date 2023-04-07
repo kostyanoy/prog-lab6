@@ -1,7 +1,7 @@
 package commands
 
+import CommandResult
 import data.MusicBand
-import utils.CommandResult
 
 /**
 
