@@ -29,7 +29,7 @@ interface Interactor {
      *
      * @param argTypes the list of [ArgumentType]
      */
-    fun getArgs(argTypes: List<ArgumentType>): ArrayList<Any>
+    fun getArgs(argTypes: Array<ArgumentType>): Array<Any>
 
     /**
      * Executes the command aka sending request to server
@@ -37,4 +37,11 @@ interface Interactor {
      * @param command the name of the command
      */
     fun executeCommand(command: String)
+
+    /**
+     * Returns current client
+     *
+     * @return the client connected to the server
+     */
+    fun getClient() : ClientApp
 }

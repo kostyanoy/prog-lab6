@@ -1,5 +1,6 @@
 import di.clientModule
-import org.koin.core.context.startKoin
+import org.koin.core.context.GlobalContext.startKoin
+import serialize.FrameSerializer
 
 
 /**
@@ -10,6 +11,15 @@ fun main() {
         modules(clientModule)
     }
 
-    ClientApp(12345).start()
+    var command = "connect"
+
+    while (command != "exit") {
+        if (command == "connect") {
+            ClientApp("localhost", 2228).start()
+            println("Клиент закрылся")
+        }
+        print("connect or exit: ")
+        command = readln()
+    }
 }
 

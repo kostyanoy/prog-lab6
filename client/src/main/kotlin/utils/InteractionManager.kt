@@ -2,9 +2,8 @@ package utils
 
 import ArgumentType
 import ClientApp
+import CommandResult
 import FileManager
-import Frame
-import FrameType
 import data.MusicGenre
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -17,28 +16,32 @@ import org.koin.core.component.inject
  */
 class InteractionManager(
     private val userManager: ReaderWriter,
-    private val fileManager: FileManager
-) : KoinComponent, Interactor{
+    private val fileManager: FileManager,
+    private val commandManager: CommandManager
+) : KoinComponent, Interactor {
 
     private val validator: Validator by inject()
-    private val commandManager: CommandManager by inject()
     private val invitation = ">>>"
     private var isActive = true
     private var lastArgument: String? = null
     private val executingFiles = ArrayDeque<String>()
     private lateinit var clientApp: ClientApp
 
+    override fun getClient(): ClientApp = clientApp
+
     override fun start(clientApp: ClientApp) {
         this.clientApp = clientApp
-        userManager.writeLine("Произошло подключение к ${clientApp.socket.inetAddress}:${clientApp.socket.port}")
         userManager.writeLine("Здрасьте, для вывода списка команд введите help")
+        executeCommand("update_commands")
         while (isActive) {
-            interact()
+            userManager.write(invitation)
+            interact(userManager.readLine())
         }
     }
 
     override fun exit() {
         isActive = false
+        clientApp.stop()
     }
 
     override fun executeCommandFile(path: String) {
@@ -52,9 +55,8 @@ class InteractionManager(
         executingFiles.removeLast()
     }
 
-    private fun interact() {
-        userManager.write(invitation)
-        val input = userManager.readLine().split(" ")
+    private fun interact(text: String) {
+        val input = text.split(" ")
         if (input.count() > 2) {
             userManager.writeLine("Слишком много аргументов в строке")
             return
@@ -73,19 +75,20 @@ class InteractionManager(
     override fun executeCommand(command: String) {
         val argTypes = commandManager.getArgs(command)
         val args = getArgs(argTypes)
-        clientApp.sendFrame(Frame(FrameType.COMMAND_REQUEST))
-        TODO()
-//        when (val result = command.execute(args)) {
-//            is CommandResult.Failure -> userManager.writeLine("Команда ${result.commandName} завершилась ошибкой: ${result.throwable.message}")
-//            is CommandResult.Success -> {
-//                userManager.writeLine("Команда ${result.commandName} исполнена.")
-//                result.message?.let { userManager.writeLine(it) }
-//                history.executedCommand(command)
-//            }
-//        }
+
+        when (val result = commandManager.executeCommand(clientApp, command, args)) {
+            is CommandResult.Failure -> userManager.writeLine("Команда ${result.commandName} завершилась ошибкой: ${result.throwable.message}")
+            is CommandResult.Success -> {
+                userManager.writeLine("Команда ${result.commandName} исполнена.")
+                result.message?.let { userManager.writeLine(it) }
+            }
+
+            null -> userManager.writeLine("Сервер вернул непотребщину")
+        }
+
     }
 
-    override fun getArgs(argTypes: List<ArgumentType>): ArrayList<Any> {
+    override fun getArgs(argTypes: Array<ArgumentType>): Array<Any> {
         val args = arrayListOf<Any>()
         argTypes.forEach {
             args.add(when (it) {
@@ -95,6 +98,6 @@ class InteractionManager(
                 ArgumentType.MUSIC_BAND -> validator.getMusicBand()
             })
         }
-        return args
+        return args.toArray()
     }
 }

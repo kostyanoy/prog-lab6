@@ -2,15 +2,12 @@ package utils
 
 import ArgumentType
 import ClientApp
-import Frame
-import FrameType
 import data.Album
 import data.Coordinates
 import data.MusicBand
 import data.MusicGenre
 import exceptions.CommandFileException
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * Executes commands from the file
@@ -25,7 +22,6 @@ class FileInteractor(
 ) : KoinComponent, Interactor by interactor, Validator {
     private var index = 0
     private var lastArgument: String? = null
-    private val commandManager: CommandManager by inject()
     private lateinit var clientApp: ClientApp
 
     /**
@@ -59,19 +55,7 @@ class FileInteractor(
         }
     }
 
-    override fun executeCommand(command: String) {
-        val argTypes = commandManager.getArgs(command)
-        val args = getArgs(argTypes)
-        clientApp.sendFrame(Frame(FrameType.COMMAND_REQUEST))
-        TODO()
-//        val args = getArgs(command)
-//        when (val result = command.execute(args)) {
-//            is CommandResult.Failure -> throw result.throwable
-//            is CommandResult.Success -> {}
-//        }
-    }
-
-    override fun getArgs(argTypes: List<ArgumentType>): ArrayList<Any> {
+    override fun getArgs(argTypes: Array<ArgumentType>): Array<Any> {
         val args = arrayListOf<Any>()
         argTypes.forEach {
             args.add(
@@ -83,7 +67,7 @@ class FileInteractor(
                 }
             )
         }
-        return args
+        return args.toArray()
     }
 
     override fun getString(): String = lastArgument ?: throw CommandFileException("Нет аргумента")

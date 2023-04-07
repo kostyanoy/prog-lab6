@@ -21,7 +21,7 @@ val clientModule = module {
         ValidationManager(interactor = get(), userManager = get())
     }
 
-    factory {
+    single {
         CommandManager()
     }
 
@@ -29,7 +29,11 @@ val clientModule = module {
         FileManager()
     }
 
-    factory<Interactor> {
-        InteractionManager(userManager = get(), fileManager = get())
+    factory {
+        FrameSerializer()
+    }
+
+    single<Interactor> {
+        InteractionManager(userManager = get(), fileManager = get(), commandManager = get())
     }
 }
