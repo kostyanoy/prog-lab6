@@ -4,11 +4,7 @@ import ArgumentType
 import CommandResult
 import data.MusicBand
 import data.MusicGenre
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationException
+import kotlinx.serialization.*
 import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
@@ -32,7 +28,7 @@ object KAnySerializer : KSerializer<Any> {
         element("musicBand", MusicBand.serializer().descriptor)
         element("musicGenre", MusicGenre.serializer().descriptor)
         element<CommandResult.Success>("success")
-        element<CommandResult>("commandResult")
+        element<CommandResult.Failure>("failure")
         element<Array<@Contextual Any>>("list")
         element<Map<String, Array<ArgumentType>>>("map")
     }
@@ -45,7 +41,7 @@ object KAnySerializer : KSerializer<Any> {
             is MusicBand -> encoder.encodeSerializableValue(MusicBand.serializer(), value)
             is MusicGenre -> encoder.encodeSerializableValue(MusicGenre.serializer(), value)
             is CommandResult.Success -> encoder.encodeSerializableValue(CommandResult.Success.serializer(), value)
-            is CommandResult -> encoder.encodeSerializableValue(CommandResult.serializer(), value)
+            is CommandResult.Failure -> encoder.encodeSerializableValue(CommandResult.Failure.serializer(), value)
             is Array<*> -> encoder.encodeSerializableValue(ArraySerializer(KAnySerializer), value as Array<Any>)
             is Map<*, *> -> {
                 encoder.encodeSerializableValue(
@@ -76,6 +72,11 @@ object KAnySerializer : KSerializer<Any> {
 
             jsonElement.isString() -> jsonElement.jsonPrimitive.content
             jsonElement.isInt() -> jsonElement.jsonPrimitive.int
+            jsonElement.isObject() && jsonElement.jsonObject.containsKey("commandName")
+                    && jsonElement.jsonObject.containsKey("throwable") -> jsonDecoder.json.decodeFromJsonElement(
+                CommandResult.Failure.serializer(), jsonElement
+            )
+
             jsonElement.isObject() && jsonElement.jsonObject.containsKey("commandName") -> jsonDecoder.json.decodeFromJsonElement(
                 CommandResult.Success.serializer(), jsonElement
             )

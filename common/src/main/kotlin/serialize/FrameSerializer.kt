@@ -14,6 +14,7 @@ class FrameSerializer : Serializer<Frame> {
     private val module = SerializersModule {
         contextual(KAnySerializer)
         contextual(KZonedDateTimeSerializer)
+        contextual(KThrowableSerializer)
     }
 
     private val serializer = Json { serializersModule = module }
