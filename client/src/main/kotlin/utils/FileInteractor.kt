@@ -26,6 +26,8 @@ class FileInteractor(
 
     /**
      * Starts executing commands from file
+     *
+     * @param clientApp the current client connected to the server
      */
     override fun start(clientApp: ClientApp) {
         this.clientApp = clientApp
@@ -34,13 +36,21 @@ class FileInteractor(
         }
     }
 
+    /**
+     * Stops executing file commands
+     */
     override fun exit() {
         interactor.exit()
         index = lines.count()
     }
 
+    /**
+     * Takes commands one by one and arguments in the line. Tries to execute command
+     *
+     * @param stringCommand the string with the command
+     */
     private fun interact(stringCommand: String) {
-        val input = stringCommand.split(" ")
+        val input = stringCommand.trim().split(" ")
         if (input.count() > 2) {
             throw CommandFileException("Слишком много аргументов в строке")
         }
@@ -55,6 +65,12 @@ class FileInteractor(
         }
     }
 
+    /**
+     * Gets arguments from files by checking last argument or next line
+     *
+     * @param argTypes array with [ArgumentType]
+     * @return Any array filled with needed arguments
+     */
     override fun getArgs(argTypes: Array<ArgumentType>): Array<Any> {
         val args = arrayListOf<Any>()
         argTypes.forEach {
@@ -112,6 +128,8 @@ class FileInteractor(
 
     /**
      * Check if there is next line of the command file
+     *
+     * @return true if it is not last line yet
      */
     fun hasNext(): Boolean = (index < lines.count())
 }

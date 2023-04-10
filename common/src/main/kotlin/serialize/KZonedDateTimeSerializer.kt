@@ -9,7 +9,7 @@ import kotlinx.serialization.encoding.Encoder
 import java.time.ZonedDateTime
 
 /**
- * Explains how to serialize [ZonedDateTime]
+ * Contextual serializer for [ZonedDateTime]
  */
 object KZonedDateTimeSerializer : KSerializer<ZonedDateTime> {
     override val descriptor: SerialDescriptor =

@@ -12,17 +12,16 @@ import java.nio.charset.Charset
 class ConsoleManager : ReaderWriter {
     private val inputStream: InputStream = System.`in`
     private val reader = InputStreamReader(inputStream, Charset.forName("UTF-8"))
-
-
+    
     override fun readLine(): String = BufferedReader(reader).readLine()
     override fun writeLine(text: String) = println(text)
     override fun write(text: String) = print(text)
 
     override fun getValidatedValue(message: String, validator: (String) -> Boolean): String {
         write(message)
-        while (true){
+        while (true) {
             val userInput = readLine()
-            if (validator(userInput)){
+            if (validator(userInput)) {
                 return userInput
             }
 

@@ -6,6 +6,9 @@ import exceptions.CommandException
 import org.koin.core.component.inject
 import utils.CommandManager
 
+/**
+ * The command receive available server commands
+ */
 class UpdateCommands : ClientCommand() {
     private val commandManager: CommandManager by inject()
     override fun getDescription(): String = "update_commands : запросить у сервера список доступных команд"

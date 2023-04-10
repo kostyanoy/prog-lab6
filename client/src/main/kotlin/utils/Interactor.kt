@@ -39,9 +39,9 @@ interface Interactor {
     fun executeCommand(command: String)
 
     /**
-     * Returns current client
+     * Returns current client connected to the server
      *
      * @return the client connected to the server
      */
-    fun getClient() : ClientApp
+    fun getClient(): ClientApp
 }

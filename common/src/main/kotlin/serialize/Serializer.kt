@@ -5,18 +5,18 @@ package serialize
  */
 interface Serializer<T> {
     /**
-     * Serialize [LinkedHashMap] collection to [String]
+     * Serialize object to [String]
      *
-     * @param collection the [LinkedHashMap] collection that will be serialized
+     * @param collection the object that will be serialized
      * @return serialized [String]
      */
     fun serialize(collection: T): String
 
     /**
-     * Deserialize [LinkedHashMap] collection from [String]
+     * Deserialize object from [String]
      *
      * @param serialized the serialized [String] that will be deserialized
-     * @return deserialized [LinkedHashMap] collection
+     * @return deserialized object
      */
     fun deserialize(serialized: String): T
 }

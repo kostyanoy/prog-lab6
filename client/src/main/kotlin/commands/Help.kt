@@ -5,6 +5,9 @@ import CommandResult
 import org.koin.core.component.inject
 import utils.CommandManager
 
+/**
+ * The command displays available commands
+ */
 class Help : ClientCommand() {
     private val commandManager: CommandManager by inject()
 

@@ -13,6 +13,7 @@ import org.koin.core.component.inject
  *
  * @param userManager used to show messages to user and get input from user
  * @param fileManager used to execute command file
+ * @param commandManager manages the commands
  */
 class InteractionManager(
     private val userManager: ReaderWriter,
@@ -55,8 +56,13 @@ class InteractionManager(
         executingFiles.removeLast()
     }
 
+    /**
+     * Handles the string with command and possible argument
+     *
+     * @param text line from the user with the name of the command
+     */
     private fun interact(text: String) {
-        val input = text.split(" ")
+        val input = text.trim().split(" ")
         if (input.count() > 2) {
             userManager.writeLine("Слишком много аргументов в строке")
             return

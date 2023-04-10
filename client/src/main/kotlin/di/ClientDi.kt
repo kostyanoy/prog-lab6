@@ -8,6 +8,9 @@ import serialize.Serializer
 import utils.*
 import utils.console.ConsoleManager
 
+/**
+ * Koin module for the client part
+ */
 val clientModule = module {
     factory<ReaderWriter> {
         ConsoleManager()

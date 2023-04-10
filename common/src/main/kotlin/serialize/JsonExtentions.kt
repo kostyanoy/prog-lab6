@@ -4,7 +4,15 @@ import ArgumentType
 import data.MusicGenre
 import kotlinx.serialization.json.*
 
-fun JsonElement.isString() : Boolean {
+//extension functions needed for serializing any value
+//using a json methods to cast element to class and catch exceptions
+
+/**
+ * Checks if the json element is [String]
+ *
+ * @return true if the check is successful
+ */
+fun JsonElement.isString(): Boolean {
     return try {
         if (this.jsonPrimitive.isString)
             return true
@@ -14,7 +22,12 @@ fun JsonElement.isString() : Boolean {
     }
 }
 
-fun JsonElement.isInt() : Boolean {
+/**
+ * Checks if the json element is [Int]
+ *
+ * @return true if the check is successful
+ */
+fun JsonElement.isInt(): Boolean {
     return try {
         this.jsonPrimitive.int
         true
@@ -25,7 +38,12 @@ fun JsonElement.isInt() : Boolean {
     }
 }
 
-fun JsonElement.isObject() : Boolean {
+/**
+ * Checks if the json element is object with parameters
+ *
+ * @return true if the check is successful
+ */
+fun JsonElement.isObject(): Boolean {
     return try {
         this.jsonObject
         true
@@ -34,7 +52,12 @@ fun JsonElement.isObject() : Boolean {
     }
 }
 
-fun JsonElement.isArray() : Boolean {
+/**
+ * Checks if the json element is collection
+ *
+ * @return true if the check is successful
+ */
+fun JsonElement.isArray(): Boolean {
     return try {
         this.jsonArray
         true
@@ -43,9 +66,14 @@ fun JsonElement.isArray() : Boolean {
     }
 }
 
-fun JsonElement.isArgumentType() : Boolean {
+/**
+ * Checks if the json element is [ArgumentType]
+ *
+ * @return true if the check is successful
+ */
+fun JsonElement.isArgumentType(): Boolean {
     return try {
-        if (this.isString() && jsonArray.jsonPrimitive.content in ArgumentType.values().map { it.toString() }){
+        if (this.isString() && jsonArray.jsonPrimitive.content in ArgumentType.values().map { it.toString() }) {
             true
         }
         false
@@ -54,9 +82,14 @@ fun JsonElement.isArgumentType() : Boolean {
     }
 }
 
-fun JsonElement.isMusicGenre() : Boolean {
+/**
+ * Checks if the json element is [MusicGenre]
+ *
+ * @return true if the check is successful
+ */
+fun JsonElement.isMusicGenre(): Boolean {
     return try {
-        if (this.isString() && jsonArray.jsonPrimitive.content in MusicGenre.values().map { it.toString() }){
+        if (this.isString() && jsonArray.jsonPrimitive.content in MusicGenre.values().map { it.toString() }) {
             true
         }
         false

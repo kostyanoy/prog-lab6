@@ -5,6 +5,11 @@ import CommandResult
 import exceptions.FileException
 import org.jetbrains.kotlin.konan.file.File
 
+/**
+ * The command reads and executes the script from the specified file.
+ *
+ * Fails if no file is found.
+ */
 class ExecuteScript : ClientCommand() {
     override fun getDescription(): String =
         "execute_script : считать и исполнить скрипт из указанного файла. В скрипте содержатся команды в таком же виде, в котором их вводит пользователь в интерактивном режиме."

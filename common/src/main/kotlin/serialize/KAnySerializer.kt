@@ -19,10 +19,16 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
+/**
+ * Contextual serializer for [Any] that can be one of the known types.
+ *
+ * Uses extensions for jsonElement
+ */
 @OptIn(ExperimentalSerializationApi::class, InternalSerializationApi::class)
 object KAnySerializer : KSerializer<Any> {
 
     override val descriptor: SerialDescriptor = buildSerialDescriptor("AnySerializer", PolymorphicKind.SEALED) {
+        //list of the all known types that Any can be
         element<String>("string")
         element<Int>("int")
         element("musicBand", MusicBand.serializer().descriptor)
@@ -35,6 +41,7 @@ object KAnySerializer : KSerializer<Any> {
 
 
     override fun serialize(encoder: Encoder, value: Any) {
+        //gives its own method for each type that Any can be
         when (value) {
             is Int -> encoder.encodeInt(value)
             is String -> encoder.encodeString(value)
@@ -60,35 +67,40 @@ object KAnySerializer : KSerializer<Any> {
         val jsonDecoder = decoder as? JsonDecoder ?: throw SerializationException("Only JSON format is supported")
         val jsonElement = jsonDecoder.decodeJsonElement()
         return when {
+            //ArgumentType
             jsonElement.isArgumentType() -> jsonDecoder.json.decodeFromJsonElement(
                 ArgumentType.serializer(),
                 jsonElement
             )
-
+            //MusicGenre
             jsonElement.isMusicGenre() -> jsonDecoder.json.decodeFromJsonElement(
                 MusicGenre.serializer(),
                 jsonElement
             )
-
+            //String
             jsonElement.isString() -> jsonElement.jsonPrimitive.content
+            //Int
             jsonElement.isInt() -> jsonElement.jsonPrimitive.int
+            //CommandResult.Failure
             jsonElement.isObject() && jsonElement.jsonObject.containsKey("commandName")
                     && jsonElement.jsonObject.containsKey("throwable") -> jsonDecoder.json.decodeFromJsonElement(
                 CommandResult.Failure.serializer(), jsonElement
             )
-
+            //CommandResult.Success. Doesn't check if it has message because it can be null
             jsonElement.isObject() && jsonElement.jsonObject.containsKey("commandName") -> jsonDecoder.json.decodeFromJsonElement(
                 CommandResult.Success.serializer(), jsonElement
             )
-
+            //MusicBand
             jsonElement.isObject() && jsonElement.jsonObject.containsKey("name") -> jsonDecoder.json.decodeFromJsonElement(
                 MusicBand.serializer(), jsonElement
             )
-
+            //Array<Any>
             jsonElement.isArray() -> jsonDecoder.json.decodeFromJsonElement(
                 ArraySerializer(KAnySerializer), jsonElement
             )
 
+            //too hard to check so just be a else branch ;)
+            //Map<Any>
             else -> jsonDecoder.json.decodeFromJsonElement(
                 MapSerializer(
                     String.serializer(),

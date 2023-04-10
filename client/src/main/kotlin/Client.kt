@@ -1,6 +1,5 @@
 import di.clientModule
 import org.koin.core.context.GlobalContext.startKoin
-import serialize.FrameSerializer
 
 
 /**
@@ -11,6 +10,9 @@ fun main() {
         modules(clientModule)
     }
 
+    // this should make reconnect to the server possible
+    // connect - tries to reconnect
+    // exit    - stops the application
     var command = "connect"
 
     while (command != "exit") {

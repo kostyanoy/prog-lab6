@@ -8,7 +8,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 
 /**
- * Implements [Serializer] interface with JSON serialization
+ * Implements [Serializer] interface with JSON serialization for [LinkedHashMap]
  */
 class SerializeManager : Serializer<LinkedHashMap<Int, MusicBand>> {
     private val module = SerializersModule {

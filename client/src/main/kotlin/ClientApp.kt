@@ -2,8 +2,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import serialize.FrameSerializer
 import utils.Interactor
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
 import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.SocketTimeoutException
@@ -18,35 +16,56 @@ class ClientApp(private val serverAddress: String, private val serverPort: Int) 
 
     private lateinit var channel: SocketChannel
 
+    /**
+     * Connects to the server
+     */
     fun start() {
         try {
             channel = SocketChannel.open(InetSocketAddress(serverAddress, serverPort))
-            channel.socket().soTimeout = 5000
+            channel.socket().soTimeout = 5000 // timeout for server respond
 
             println("Произошло подключение к ${channel.remoteAddress}")
 
             interactor.start(this)
-            stop()
         } catch (e: SocketTimeoutException) {
             println("Сервер не отвечает (${e.message})")
         } catch (e: ConnectException) {
             println("Невозможно подключиться (${e.message})")
+        } finally {
+            stop()
         }
     }
 
+    /**
+     * Closes the connection
+     */
     fun stop() {
-        channel.close()
+        if (channel.isConnected)
+            channel.finishConnect()
+        if (channel.isOpen)
+            channel.close()
     }
 
+    /**
+     * Sends frame to the server
+     *
+     * @param frame which should be sent
+     */
     fun sendFrame(frame: Frame) {
         val s = frameSerializer.serialize(frame)
         channel.socket().getOutputStream().write(s.toByteArray())
     }
 
+    /**
+     * Receives frame to the server
+     *
+     * @return [Frame] which server sent
+     */
     fun receiveFrame(): Frame {
         val array = ArrayList<Byte>()
         var char = channel.socket().getInputStream().read()
-        while (char == -1 || Char(char) != '\n'){
+        //not very good way to do this/ Can be stuck forever.
+        while (char == -1 || Char(char) != '\n') {
             if (char == -1)
                 continue
             array.add(char.toByte())
