@@ -1,3 +1,4 @@
+import mu.KotlinLogging
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import serialize.FrameSerializer
@@ -13,6 +14,7 @@ import java.nio.channels.SocketChannel
 class ClientApp(private val serverAddress: String, private val serverPort: Int) : KoinComponent {
     private val interactor by inject<Interactor>()
     private val frameSerializer by inject<FrameSerializer>()
+    private val logger = KotlinLogging.logger {}
 
     private lateinit var channel: SocketChannel
 
@@ -24,13 +26,13 @@ class ClientApp(private val serverAddress: String, private val serverPort: Int) 
             channel = SocketChannel.open(InetSocketAddress(serverAddress, serverPort))
             channel.socket().soTimeout = 5000 // timeout for server respond
 
-            println("Произошло подключение к ${channel.remoteAddress}")
+            logger.info { "Произошло подключение к ${channel.remoteAddress}" }
 
             interactor.start(this)
         } catch (e: SocketTimeoutException) {
-            println("Сервер не отвечает (${e.message})")
+            logger.info { "Сервер не отвечает (${e.message})" }
         } catch (e: ConnectException) {
-            println("Невозможно подключиться (${e.message})")
+            logger.info { "Невозможно подключиться (${e.message})" }
         } finally {
             stop()
         }
@@ -40,10 +42,14 @@ class ClientApp(private val serverAddress: String, private val serverPort: Int) 
      * Closes the connection
      */
     fun stop() {
-        if (channel.isConnected)
+        if (channel.isConnected) {
             channel.finishConnect()
-        if (channel.isOpen)
+            logger.info { "Соединение закрыто" }
+        }
+        if (channel.isOpen) {
             channel.close()
+            logger.info { "Канал закрыт" }
+        }
     }
 
     /**
@@ -54,6 +60,7 @@ class ClientApp(private val serverAddress: String, private val serverPort: Int) 
     fun sendFrame(frame: Frame) {
         val s = frameSerializer.serialize(frame)
         channel.socket().getOutputStream().write(s.toByteArray())
+        logger.info { "Отправлен запрос на сервер ${frame.type}" }
     }
 
     /**
@@ -72,7 +79,9 @@ class ClientApp(private val serverAddress: String, private val serverPort: Int) 
             char = channel.socket().getInputStream().read()
         }
         val str = String(array.toByteArray())
-        return frameSerializer.deserialize(str)
+        val frame = frameSerializer.deserialize(str)
+        logger.info { "Получен ответ от сервера ${frame.type}" }
+        return frame
     }
 }
 
