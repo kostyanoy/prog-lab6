@@ -73,10 +73,7 @@ fun JsonElement.isArray(): Boolean {
  */
 fun JsonElement.isArgumentType(): Boolean {
     return try {
-        if (this.isString() && jsonArray.jsonPrimitive.content in ArgumentType.values().map { it.toString() }) {
-            true
-        }
-        false
+        this.isString() && this.jsonPrimitive.content in ArgumentType.values().map { it.toString() }
     } catch (e: IllegalArgumentException) {
         false
     }
@@ -89,10 +86,7 @@ fun JsonElement.isArgumentType(): Boolean {
  */
 fun JsonElement.isMusicGenre(): Boolean {
     return try {
-        if (this.isString() && jsonArray.jsonPrimitive.content in MusicGenre.values().map { it.toString() }) {
-            true
-        }
-        false
+        this.isString() && this.jsonPrimitive.content in MusicGenre.values().map { it.toString() }
     } catch (e: IllegalArgumentException) {
         false
     }

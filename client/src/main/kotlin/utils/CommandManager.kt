@@ -40,6 +40,7 @@ class CommandManager {
         val frame = Frame(FrameType.LIST_OF_COMMANDS_REQUEST)
         clientApp.sendFrame(frame)
         val respond = clientApp.receiveFrame()
+        if (respond.type != FrameType.LIST_OF_COMMANDS_RESPONSE) return false
         val serverCommands = respond.body["commands"] as? Map<String, Array<ArgumentType>> ?: return false
         commands.clear()
         commands.putAll(clientCommands.mapValues { e -> e.value.getArgumentTypes() })
@@ -65,12 +66,12 @@ class CommandManager {
         if (isClientCommand(command)) {
             return clientCommands[command]!!.execute(args)
         }
-
         val frame = Frame(FrameType.COMMAND_REQUEST)
         frame.setValue("name", command)
         frame.setValue("args", args)
         clientApp.sendFrame(frame)
-        return clientApp.receiveFrame().body["data"] as? CommandResult
+        val respond = clientApp.receiveFrame()
+        return if (respond.type == FrameType.COMMAND_RESPONSE) respond.body["data"] as? CommandResult else null
     }
 
     /**

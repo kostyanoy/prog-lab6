@@ -31,6 +31,7 @@ class InteractionManager(
     override fun getClient(): ClientApp = clientApp
 
     override fun start(clientApp: ClientApp) {
+        this.isActive = true
         this.clientApp = clientApp
         userManager.writeLine("Здрасьте, для вывода списка команд введите help")
         executeCommand("update_commands")

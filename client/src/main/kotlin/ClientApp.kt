@@ -24,17 +24,17 @@ class ClientApp(private val serverAddress: String, private val serverPort: Int) 
     fun start() {
         try {
             channel = SocketChannel.open(InetSocketAddress(serverAddress, serverPort))
-            channel.socket().soTimeout = 5000 // timeout for server respond
+            channel.socket()?.soTimeout = 5000 // timeout for server respond
 
             logger.info { "Произошло подключение к ${channel.remoteAddress}" }
 
             interactor.start(this)
+
+            stop()
         } catch (e: SocketTimeoutException) {
             logger.info { "Сервер не отвечает (${e.message})" }
         } catch (e: ConnectException) {
             logger.info { "Невозможно подключиться (${e.message})" }
-        } finally {
-            stop()
         }
     }
 
