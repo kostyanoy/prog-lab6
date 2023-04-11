@@ -71,10 +71,7 @@ class ClientApp(private val serverAddress: String, private val serverPort: Int) 
     fun receiveFrame(): Frame {
         val array = ArrayList<Byte>()
         var char = channel.socket().getInputStream().read()
-        //not very good way to do this/ Can be stuck forever.
-        while (char == -1 || Char(char) != '\n') {
-            if (char == -1)
-                continue
+        while (Char(char) != '\n') {
             array.add(char.toByte())
             char = channel.socket().getInputStream().read()
         }
