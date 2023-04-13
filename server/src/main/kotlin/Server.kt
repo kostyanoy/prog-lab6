@@ -7,12 +7,22 @@ fun main() {
     val thread = thread {
         while (true) {
             val command = readlnOrNull()
-            if (command == "exit") {
-                server.stop()
-                break
+            when (command) {
+                "exit" -> {
+                    server.stop()
+                }
+                "save" -> {
+                    server.saveCollection()
+                }
+                "load" -> { server.loadCollection()
+
+                }
             }
+            break
+
         }
     }
+
     startKoin {
         modules(serverModule)
     }

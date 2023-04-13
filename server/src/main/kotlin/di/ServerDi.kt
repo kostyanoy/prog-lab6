@@ -1,10 +1,12 @@
 package di
+import FileManager
 import ServerApp
 import commands.CommandHistory
 import data.MusicBand
 import org.koin.dsl.module
 import serialize.Serializer
 import utils.*
+import utils.StorageManager
 import serialize.SerializeManager
 
 val serverModule = module {
@@ -27,7 +29,7 @@ val serverModule = module {
     single<Storage<LinkedHashMap<Int, MusicBand>, Int, MusicBand>> {
         StorageManager()
     }
-    factory {
+    single {
         CommandManager()
     }
     single { ServerApp(2228) }

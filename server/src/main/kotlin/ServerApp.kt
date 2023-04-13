@@ -1,3 +1,4 @@
+import data.MusicBand
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import serialize.FrameSerializer
@@ -10,6 +11,7 @@ import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 import org.apache.log4j.Logger
 import utils.FileSaver
+import utils.Saver
 import utils.StorageManager
 
 class ServerApp(private val port: Int) : KoinComponent {
@@ -51,6 +53,7 @@ class ServerApp(private val port: Int) : KoinComponent {
         selector.close()
         logger.info("Сервер закрыт")
     }
+
     private fun acceptConnection(key: SelectionKey, selector: Selector) {
         val serverSocketChannel = key.channel() as ServerSocketChannel
         val socketChannel = serverSocketChannel.accept()
@@ -109,18 +112,18 @@ class ServerApp(private val port: Int) : KoinComponent {
             }
         }
     }
+
     fun stop() {
         running = false
         selector.wakeup()
     }
+
     fun saveCollection() {
+        val saver: Saver<LinkedHashMap<Int, MusicBand>> by inject()
         saver.save(storage.getCollection { true })
     }
 
     fun loadCollection() {
-        val saver: FileSaver by inject()
-        storage.clear()
         saver.load().forEach { storage.insert(it.key, it.value) }
     }
 }
-
