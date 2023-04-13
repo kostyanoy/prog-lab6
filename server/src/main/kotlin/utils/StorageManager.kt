@@ -7,7 +7,6 @@ The StorageManager class implements the Storage interface and represents a colle
 
 It uses a LinkedHashMap to store the elements and provides methods to manipulate the collection, such as adding,
 updating, removing, and clearing elements.
-@property musicBandCollection the underlying LinkedHashMap that stores the MusicBand objects.
  */
 class StorageManager : Storage<LinkedHashMap<Int, MusicBand>, Int, MusicBand> {
     private val date: LocalDateTime = LocalDateTime.now()
