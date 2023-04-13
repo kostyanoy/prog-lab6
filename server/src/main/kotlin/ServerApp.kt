@@ -15,9 +15,6 @@ import utils.*
 
 The ServerApp class represents the server application that listens to incoming client requests,executes them and sends back the response.
 
-@property [commandManager] The CommandManager instance used to execute the received commands.
-@property [saver] The FileSaver instance used to save and load the collection.
-@property [storage] The StorageM anager instance used to manage the collection.
 @property [running] A boolean value indicating whether the server is running or not.
 @property [selector] The Selector instance used for selecting incoming channels and operations.
 @property [serverChannel] The ServerSocketChannel instance used to listen for incoming requests.
@@ -66,6 +63,9 @@ class ServerApp(private val port: Int) : KoinComponent {
     }
     /**
     Accepts a new incoming connection and registers it with the selector.
+
+    @param [key] The SelectionKey of the incoming connection.
+    @param [selector] The Selector instance used for selecting incoming channels and operations.
      */
     private fun acceptConnection(key: SelectionKey, selector: Selector) {
         val serverSocketChannel = key.channel() as ServerSocketChannel
@@ -75,6 +75,9 @@ class ServerApp(private val port: Int) : KoinComponent {
     }
     /**
     Reads the incoming request from the client, executes it and sends back the response.
+
+    @param [key] The SelectionKey of the incoming request.
+    @param [selector] The Selector instance used for selecting incoming channels and operations.
      */
     private fun readRequest(key: SelectionKey, selector: Selector) {
         val socketChannel = key.channel() as SocketChannel
@@ -102,6 +105,9 @@ class ServerApp(private val port: Int) : KoinComponent {
     }
     /**
     Processes a client request and returns a response frame.
+
+    @param [request] the request frame received from the client
+    @return the response frame to be sent back to the client
      */
     private fun clientRequest(request: Frame): Frame {
         return when (request.type) {
