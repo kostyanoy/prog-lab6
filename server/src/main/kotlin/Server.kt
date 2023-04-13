@@ -13,15 +13,14 @@ fun main() {
             when (command) {
                 "exit" -> {
                     server.stop()
+                    break
                 }
                 "save" -> {
                     server.saveCollection()
                 }
                 "load" -> { server.loadCollection()
-
                 }
             }
-            break
 
         }
     }

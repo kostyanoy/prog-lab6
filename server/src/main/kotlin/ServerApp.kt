@@ -2,7 +2,6 @@ import data.MusicBand
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import serialize.FrameSerializer
-import utils.CommandManager
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
@@ -10,9 +9,8 @@ import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 import org.apache.log4j.Logger
-import utils.FileSaver
-import utils.Saver
-import utils.StorageManager
+import utils.*
+
 /**
 
 The ServerApp class represents the server application that listens to incoming client requests,executes them and sends back the response.
@@ -29,8 +27,8 @@ The ServerApp class represents the server application that listens to incoming c
  */
 class ServerApp(private val port: Int) : KoinComponent {
     private val commandManager: CommandManager by inject()
-    private val saver: FileSaver by inject()
-    private val storage: StorageManager by inject()
+    private val saver: Saver<LinkedHashMap<Int, MusicBand>> by inject()
+    private val storage: Storage<LinkedHashMap<Int, MusicBand>, Int, MusicBand> by inject()
     private val serializer = FrameSerializer()
     private val logger = Logger.getLogger(ServerApp::class.java)
     private var running = true
@@ -156,8 +154,10 @@ class ServerApp(private val port: Int) : KoinComponent {
     fun saveCollection() {
         val saver: Saver<LinkedHashMap<Int, MusicBand>> by inject()
         saver.save(storage.getCollection { true })
+        logger.info("Коллекция сохранена")
     }
     fun loadCollection() {
         saver.load().forEach { storage.insert(it.key, it.value) }
+        logger.info("Коллекция загружена")
     }
 }

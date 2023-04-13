@@ -17,9 +17,6 @@ val serverModule = module {
         SerializeManager()
     }
 
-    factory<Serializer<LinkedHashMap<Int, MusicBand>>> {
-        SerializeManager()
-    }
     factory {
         FileManager()
     }
