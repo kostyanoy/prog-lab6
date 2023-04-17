@@ -25,7 +25,7 @@ class ServerApp(private val port: Int) : KoinComponent {
     private val storage: Storage<LinkedHashMap<Int, MusicBand>, Int, MusicBand> by inject()
     private val serializer = FrameSerializer()
     private val logger = Logger.getLogger(ServerApp::class.java)
-    private var running = true
+    var running = true
     private var selector: Selector = Selector.open()
     private lateinit var serverChannel: ServerSocketChannel
     /**
@@ -67,7 +67,7 @@ class ServerApp(private val port: Int) : KoinComponent {
     @param [key] The SelectionKey of the incoming connection.
     @param [selector] The Selector instance used for selecting incoming channels and operations.
      */
-    private fun acceptConnection(key: SelectionKey, selector: Selector) {
+    fun acceptConnection(key: SelectionKey, selector: Selector) {
         val serverSocketChannel = key.channel() as ServerSocketChannel
         val socketChannel = serverSocketChannel.accept()
         socketChannel.configureBlocking(false)
