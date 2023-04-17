@@ -7,6 +7,7 @@ import FileManager
 import data.MusicGenre
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.IOException
 
 /**
  * Implements [Interactor] interface. Executes load command on start
@@ -72,7 +73,10 @@ class InteractionManager(
             val command = input[0]
             lastArgument = if (input.count() == 2) input[1] else null
             executeCommand(command)
+        } catch (e: IOException) {
+            exit()
         } catch (e: Throwable) {
+            userManager.writeLine(e.toString())
             userManager.writeLine(e.message ?: "")
         } finally {
             executingFiles.clear()
