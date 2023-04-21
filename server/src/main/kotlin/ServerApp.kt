@@ -1,15 +1,17 @@
 import data.MusicBand
+import org.apache.log4j.Logger
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import serialize.FrameSerializer
+import utils.CommandManager
+import utils.Saver
+import utils.Storage
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
-import org.apache.log4j.Logger
-import utils.*
 
 /**
 
@@ -19,7 +21,9 @@ The ServerApp class represents the server application that listens to incoming c
 @property [selector] The Selector instance used for selecting incoming channels and operations.
 @property [serverChannel] The ServerSocketChannel instance used to listen for incoming requests.
  */
-class ServerApp(private val port: Int) : KoinComponent {
+class ServerApp(
+    private val port: Int,
+) : KoinComponent {
     private val commandManager: CommandManager by inject()
     private val saver: Saver<LinkedHashMap<Int, MusicBand>> by inject()
     private val storage: Storage<LinkedHashMap<Int, MusicBand>, Int, MusicBand> by inject()
@@ -28,14 +32,17 @@ class ServerApp(private val port: Int) : KoinComponent {
     var running = true
     private var selector: Selector = Selector.open()
     private lateinit var serverChannel: ServerSocketChannel
+    lateinit var onConnect: (SelectionKey, Selector) -> Unit
+    lateinit var onDisconnect: (SelectionKey, SocketChannel) -> Unit
+
     /**
     Starts the server and listens for incoming client requests.
      */
     fun start() {
-        logger.info("Сервер запускается на порту: $port")
         val serverChannel = ServerSocketChannel.open()
         serverChannel.bind(InetSocketAddress(port))
         serverChannel.configureBlocking(false)
+        logger.info("Сервер запускается на порту: $port")
         serverChannel.register(selector, SelectionKey.OP_ACCEPT)
 
         while (running) {
@@ -51,7 +58,8 @@ class ServerApp(private val port: Int) : KoinComponent {
                 }
 
                 if (key.isAcceptable) {
-                    acceptConnection(key, selector)
+                    onConnect(key, selector)
+                    //acceptConnection(key, selector)
                 } else if (key.isReadable) {
                     readRequest(key, selector)
                 }
@@ -61,6 +69,7 @@ class ServerApp(private val port: Int) : KoinComponent {
         selector.close()
         logger.info("Сервер закрыт")
     }
+
     /**
     Accepts a new incoming connection and registers it with the selector.
 
@@ -73,6 +82,7 @@ class ServerApp(private val port: Int) : KoinComponent {
         socketChannel.configureBlocking(false)
         socketChannel.register(selector, SelectionKey.OP_READ)
     }
+
     /**
     Reads the incoming request from the client, executes it and sends back the response.
 
@@ -99,10 +109,12 @@ class ServerApp(private val port: Int) : KoinComponent {
             socketChannel.write(buffer)
         } catch (e: Exception) {
             logger.error(e.message)
-            key.cancel()
-            socketChannel.close()
+            onDisconnect(key, socketChannel)
+//            key.cancel()
+//            socketChannel.close()
         }
     }
+
     /**
     Processes a client request and returns a response frame.
 
@@ -135,6 +147,7 @@ class ServerApp(private val port: Int) : KoinComponent {
             }
         }
     }
+
     /**
     Stops the server
      */
@@ -142,11 +155,13 @@ class ServerApp(private val port: Int) : KoinComponent {
         running = false
         selector.wakeup()
     }
+
     fun saveCollection() {
         val saver: Saver<LinkedHashMap<Int, MusicBand>> by inject()
         saver.save(storage.getCollection { true })
         logger.info("Коллекция сохранена")
     }
+
     fun loadCollection() {
         saver.load().forEach { storage.insert(it.key, it.value) }
         logger.info("Коллекция загружена")

@@ -23,7 +23,8 @@ class ClientApp(private val serverAddress: String, private val serverPort: Int) 
      */
     fun start() {
         try {
-            channel = SocketChannel.open(InetSocketAddress(serverAddress, serverPort))
+            channel = SocketChannel.open()
+            channel.socket().connect(InetSocketAddress(serverAddress, serverPort), 5000)
             channel.socket()?.soTimeout = 5000 // timeout for server respond
 
             logger.info { "Произошло подключение к ${channel.remoteAddress}" }

@@ -35,7 +35,7 @@ class InteractionManager(
         this.isActive = true
         this.clientApp = clientApp
         userManager.writeLine("Здрасьте, для вывода списка команд введите help")
-        executeCommand("update_commands")
+        //executeCommand("update_commands")
         while (isActive) {
             userManager.write(invitation)
             interact(userManager.readLine())

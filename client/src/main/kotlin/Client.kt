@@ -19,7 +19,7 @@ fun main() {
 
     while (command != "exit") {
         if (command == "connect") {
-            ClientApp("localhost", 2228).start()
+            ClientApp("localhost", 2232).start()
             logger.info {"Клиент закрылся"}
         }
         print("connect or exit: ")
